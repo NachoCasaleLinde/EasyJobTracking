@@ -1,9 +1,10 @@
 <template>
   <div class="main-container">
     <div class="login-container">
-      <div class="logo">logo</div>
       <div class="text-container">
-        <div class="welcome-message">Bienvenida a EasyJobTracking</div>
+        <div class="flex flex-center"><img src="/logo.png" style="width: 125px" /></div>
+
+        <div class="welcome-message">Bienvenida a Empleo Track</div>
         <div class="secondary-message">Cada oportunidad empieza con un buen seguimiento.</div>
       </div>
       <div class="login-data">
@@ -93,7 +94,6 @@ const password = ref('');
       .welcome-message {
         font-size: 40px;
         font-weight: bold;
-        margin-top: 20px;
         letter-spacing: 0.5px;
       }
 
