@@ -26,7 +26,7 @@ export const useAuthStore = defineStore('auth', {
      */
     signUpUser(email: string, password: string) {
       createUserWithEmailAndPassword(auth, email, password)
-        .then(async (userCredential) => {
+        .then((userCredential) => {
           // Store user data
           this.signedUserData = userCredential.user;
           // Go to home page
@@ -62,11 +62,11 @@ export const useAuthStore = defineStore('auth', {
      */
     logInUser(email: string, password: string) {
       signInWithEmailAndPassword(auth, email, password)
-        .then(async (userCredential) => {
+        .then((userCredential) => {
           // Store user data
           this.signedUserData = userCredential.user;
           // Go to home page
-          await useRouter().push('/home');
+          void useRouter().push('/home');
         })
         .catch((error) => {
           console.error('Error during login:', error.code, error.message);
@@ -88,7 +88,7 @@ export const useAuthStore = defineStore('auth', {
      */
     logOutUser() {
       signOut(auth)
-        .then(async () => {
+        .then(() => {
           this.signedUserData = null;
 
           Notify.create({
@@ -97,7 +97,7 @@ export const useAuthStore = defineStore('auth', {
             position: 'top',
           });
 
-          await useRouter().push('/login');
+          void useRouter().push('/login');
         })
         .catch((error) => {
           console.error('Error during logout:', error.code, error.message);
@@ -122,22 +122,20 @@ export const useAuthStore = defineStore('auth', {
       const router = useRouter();
 
       onAuthStateChanged(auth, (user) => {
-        void (async () => {
-          if (user) {
-            this.signedUserData = user;
+        if (user) {
+          this.signedUserData = user;
 
-            // Avoid redirect loop if already on home
-            if (router.currentRoute.value.path !== '/home') {
-              await router.push('/home');
-            }
-          } else {
-            this.signedUserData = null;
-            // Avoid redirect loop if already on login
-            if (router.currentRoute.value.path !== '/login') {
-              await router.push('/login');
-            }
+          // Avoid redirect loop if already on home
+          if (router.currentRoute.value.path !== '/home') {
+            void router.push('/home');
           }
-        })();
+        } else {
+          this.signedUserData = null;
+          // Avoid redirect loop if already on login
+          if (router.currentRoute.value.path !== '/login') {
+            void router.push('/login');
+          }
+        }
       });
     },
   },
