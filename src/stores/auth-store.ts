@@ -8,7 +8,7 @@ import {
 import { defineStore, acceptHMRUpdate } from 'pinia';
 import { Notify } from 'quasar';
 import { auth } from 'src/boot/FirebaseInit';
-import { useRouter } from 'vue-router';
+import router from 'src/router';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -30,7 +30,7 @@ export const useAuthStore = defineStore('auth', {
           // Store user data
           this.signedUserData = userCredential.user;
           // Go to home page
-          void useRouter().push('/home');
+          void router.push('/');
 
           Notify.create({
             type: 'positive',
@@ -66,7 +66,6 @@ export const useAuthStore = defineStore('auth', {
           // Store user data
           this.signedUserData = userCredential.user;
           // Go to home page
-          void useRouter().push('/home');
         })
         .catch((error) => {
           console.error('Error during login:', error.code, error.message);
