@@ -10,7 +10,14 @@
       <div class="login-data">
         <q-input outlined v-model="email" label="Correo" />
         <q-input outlined v-model="password" label="Contraseña" />
-        <q-btn class="full-width" color="primary" label="Iniciar Sesión" size="bg" rounded />
+        <q-btn
+          class="full-width"
+          color="primary"
+          label="Iniciar Sesión"
+          size="bg"
+          rounded
+          @click="handleSignIn"
+        />
         <q-btn
           outline
           color="primary"
@@ -90,6 +97,27 @@ const handleSignUp = () => {
     return;
   }
   useAuthStore().signUpUser(email.value, password.value);
+};
+
+const handleSignIn = () => {
+  if (!isValidEmail(email.value)) {
+    Notify.create({
+      type: 'negative',
+      message: 'Email no válido',
+      position: 'top',
+    });
+    return;
+  }
+  if (!isValidPassword(password.value)) {
+    Notify.create({
+      type: 'negative',
+      message:
+        'La contraseña debe tener al menos 6 caracteres, incluir letras y números, y no contener espacios.',
+      position: 'top',
+    });
+    return;
+  }
+  useAuthStore().logInUser(email.value, password.value);
 };
 
 /**
