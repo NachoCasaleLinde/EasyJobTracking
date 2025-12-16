@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-md">
-    <q-table title="Treats" :rows="rows" :columns="columns" row-key="name" />
+    <q-table title="Job Applications" :rows="rows" :columns="columns" row-key="id" flat bordered />
   </div>
 </template>
 
@@ -8,20 +8,13 @@
 /* -------------------------------------------------------------------------- */
 /* IMPORTS                                                                    */
 /* -------------------------------------------------------------------------- */
+import { type QTableColumn } from 'quasar';
+import { type IJobData } from 'src/Interfaces/globalInterfaces';
 
 /* -------------------------------------------------------------------------- */
-/* LOCAL TYPES & INTERFACES                                                         */
+/* LOCAL TYPES & INTERFACES                                                   */
 /* -------------------------------------------------------------------------- */
-interface IRow {
-  name: string;
-  calories: number;
-  fat: number;
-  carbs: number;
-  protein: number;
-  sodium: number;
-  calcium: string;
-  iron: string;
-}
+
 /* -------------------------------------------------------------------------- */
 /* PROPS                                                                      */
 /* -------------------------------------------------------------------------- */
@@ -30,154 +23,85 @@ interface IRow {
 /* -------------------------------------------------------------------------- */
 /* EMITS                                                                      */
 /* -------------------------------------------------------------------------- */
-// const emit = defineEmits<{ (e: 'close'): void }>();
+// const emit = defineEmits<{ (e: 'select', job: IJobData): void }>();
 
 /* -------------------------------------------------------------------------- */
 /* COMPOSABLES & STORES                                                       */
 /* -------------------------------------------------------------------------- */
 
 /* -------------------------------------------------------------------------- */
-/* STATE (refs, reactive, constants)                                         */
+/* STATE (refs, reactive, constants)                                          */
 /* -------------------------------------------------------------------------- */
-const columns = [
+const columns: QTableColumn<IJobData>[] = [
   {
-    name: 'name',
-    required: true,
-    label: 'Dessert (100g serving)',
-    align: 'left' as 'left' | 'right' | 'center',
-    field: (row: IRow) => row.name,
-    format: (val: string) => `${val}`,
+    name: 'jobName',
+    label: 'Position',
+    field: 'jobName',
+    align: 'left',
     sortable: true,
   },
   {
-    name: 'calories',
-    align: 'center' as 'left' | 'right' | 'center',
-    label: 'Calories',
-    field: 'calories',
+    name: 'company',
+    label: 'Company',
+    field: 'company',
+    align: 'left',
     sortable: true,
   },
-  { name: 'fat', label: 'Fat (g)', field: 'fat', sortable: true },
-  { name: 'carbs', label: 'Carbs (g)', field: 'carbs' },
-  { name: 'protein', label: 'Protein (g)', field: 'protein' },
-  { name: 'sodium', label: 'Sodium (mg)', field: 'sodium' },
   {
-    name: 'calcium',
-    label: 'Calcium (%)',
-    field: 'calcium',
+    name: 'platform',
+    label: 'Platform',
+    field: 'platform',
+    align: 'left',
     sortable: true,
-    sort: (a: string, b: string) => parseInt(a, 10) - parseInt(b, 10),
   },
   {
-    name: 'iron',
-    label: 'Iron (%)',
-    field: 'iron',
-    sortable: true,
-    sort: (a: string, b: string) => parseInt(a, 10) - parseInt(b, 10),
+    name: 'status',
+    label: 'Current Phase',
+    align: 'left',
+    field: (row) => row.status[row.status.length - 1]?.phase ?? '-',
+  },
+  {
+    name: 'notes',
+    label: 'Notes',
+    field: 'notes',
+    align: 'left',
   },
 ];
 
-const rows = [
+const rows: IJobData[] = [
   {
-    name: 'Frozen Yogurt',
-    calories: 159,
-    fat: 6.0,
-    carbs: 24,
-    protein: 4.0,
-    sodium: 87,
-    calcium: '14%',
-    iron: '1%',
+    id: '1',
+    jobName: 'Junior Front-end Developer',
+    company: 'PrettyCat',
+    platform: 'LinkedIn',
+    status: [
+      { phase: 'Applied', date: '2025-09-10' },
+      { phase: 'In progress', date: '2025-09-15' },
+    ],
+    notes: 'Working on Vue 3 components and Firebase integration',
   },
   {
-    name: 'Ice cream sandwich',
-    calories: 237,
-    fat: 9.0,
-    carbs: 37,
-    protein: 4.3,
-    sodium: 129,
-    calcium: '8%',
-    iron: '1%',
+    id: '2',
+    jobName: 'Front-end Developer',
+    company: 'Cozy Apps Studio',
+    platform: 'Company website',
+    status: [{ phase: 'Applied', date: '2025-10-01' }],
+    notes: 'Mobile-first UI, Vue + Quasar',
   },
   {
-    name: 'Eclair',
-    calories: 262,
-    fat: 16.0,
-    carbs: 23,
-    protein: 6.0,
-    sodium: 337,
-    calcium: '6%',
-    iron: '7%',
-  },
-  {
-    name: 'Cupcake',
-    calories: 305,
-    fat: 3.7,
-    carbs: 67,
-    protein: 4.3,
-    sodium: 413,
-    calcium: '3%',
-    iron: '8%',
-  },
-  {
-    name: 'Gingerbread',
-    calories: 356,
-    fat: 16.0,
-    carbs: 49,
-    protein: 3.9,
-    sodium: 327,
-    calcium: '7%',
-    iron: '16%',
-  },
-  {
-    name: 'Jelly bean',
-    calories: 375,
-    fat: 0.0,
-    carbs: 94,
-    protein: 0.0,
-    sodium: 50,
-    calcium: '0%',
-    iron: '0%',
-  },
-  {
-    name: 'Lollipop',
-    calories: 392,
-    fat: 0.2,
-    carbs: 98,
-    protein: 0,
-    sodium: 38,
-    calcium: '0%',
-    iron: '2%',
-  },
-  {
-    name: 'Honeycomb',
-    calories: 408,
-    fat: 3.2,
-    carbs: 87,
-    protein: 6.5,
-    sodium: 562,
-    calcium: '0%',
-    iron: '45%',
-  },
-  {
-    name: 'Donut',
-    calories: 452,
-    fat: 25.0,
-    carbs: 51,
-    protein: 4.9,
-    sodium: 326,
-    calcium: '2%',
-    iron: '22%',
-  },
-  {
-    name: 'KitKat',
-    calories: 518,
-    fat: 26.0,
-    carbs: 65,
-    protein: 7,
-    sodium: 54,
-    calcium: '12%',
-    iron: '6%',
+    id: '3',
+    jobName: 'Junior Web Developer',
+    company: 'Startup XYZ',
+    platform: 'Indeed',
+    status: [
+      { phase: 'Applied', date: '2025-09-20' },
+      { phase: 'Rejected', date: '2025-09-28' },
+    ],
+    notes: 'Good feedback on technical test',
+    rejectReason: 'Looking for more experience',
   },
 ];
+
 /* -------------------------------------------------------------------------- */
 /* COMPUTED                                                                   */
 /* -------------------------------------------------------------------------- */
