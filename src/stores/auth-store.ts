@@ -1,6 +1,5 @@
 import {
   createUserWithEmailAndPassword,
-  onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
   type User,
@@ -8,7 +7,6 @@ import {
 import { defineStore, acceptHMRUpdate } from 'pinia';
 import { Notify } from 'quasar';
 import { auth } from 'src/boot/FirebaseInit';
-import router from 'src/router';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -17,125 +15,104 @@ export const useAuthStore = defineStore('auth', {
 
   actions: {
     /**
-     * Creates a new user account using email and password with Firebase Auth.
-     * On success, stores the authenticated user data.
-     * On failure, logs the error and shows a Quasar notification.
+     * Creates a new user account using Firebase Auth.
+     * Returns true if the operation succeeds, false otherwise.
      *
      * @param {string} email - User email for account creation.
      * @param {string} password - User password for account creation.
      */
-    signUpUser(email: string, password: string) {
-      createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          // Store user data
-          this.signedUserData = userCredential.user;
-          // Go to home page
-          void router.push('/');
+    async signUpUser(email: string, password: string): Promise<boolean> {
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-          Notify.create({
-            type: 'positive',
-            message: '¡Cuenta creada con éxito! Bienvenido/a ✨',
-            position: 'top',
-          });
-        })
-        .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          console.error('Error during sign up:', errorCode, errorMessage);
+        this.signedUserData = userCredential.user;
 
-          Notify.create({
-            type: 'negative',
-            message:
-              'Hubo un error al crear la cuenta. Por favor, revisa tus datos o inténtalo de nuevo.',
-            position: 'top',
-          });
+        Notify.create({
+          type: 'positive',
+          message: '¡Cuenta creada con éxito! Bienvenido/a ✨',
+          position: 'top',
         });
+
+        return true;
+      } catch (error) {
+        const firebaseError = error as { code: string; message: string };
+        console.error('Error during sign up:', firebaseError.code, firebaseError.message);
+
+        Notify.create({
+          type: 'negative',
+          message:
+            'Hubo un error al crear la cuenta. Por favor, revisa tus datos o inténtalo de nuevo.',
+          position: 'top',
+        });
+
+        return false;
+      }
     },
 
     /**
      * Logs in an existing user using email and password with Firebase Auth.
-     * On success, stores the authenticated user data and redirects to home page.
-     * On failure, logs the error and shows a Quasar notification.
+     * Returns true if the operation succeeds, false otherwise.
      *
      * @param {string} email - User email for authentication.
      * @param {string} password - User password for authentication.
      */
-    logInUser(email: string, password: string) {
-      signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          // Store user data
-          this.signedUserData = userCredential.user;
-          // Go to home page
-        })
-        .catch((error) => {
-          console.error('Error during login:', error.code, error.message);
+    async logInUser(email: string, password: string): Promise<boolean> {
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
-          Notify.create({
-            type: 'negative',
-            message:
-              'Hubo un error al iniciar sesión. Por favor, revisa tus datos o inténtalo de nuevo.',
-            position: 'top',
-          });
+        // Store user data
+        this.signedUserData = userCredential.user;
+
+        return true;
+      } catch (error) {
+        const firebaseError = error as { code: string; message: string };
+        console.error('Error during login:', firebaseError.code, firebaseError.message);
+
+        Notify.create({
+          type: 'negative',
+          message:
+            'Hubo un error al iniciar sesión. Por favor, revisa tus datos o inténtalo de nuevo.',
+          position: 'top',
         });
+
+        return false;
+      }
     },
 
     /**
      * Signs out the current authenticated user from Firebase Auth.
-     * On success, clears stored user data, shows a logout message,
-     * and redirects to the login page.
-     * On failure, logs the error and shows a Quasar notification.
-     */
-    logOutUser() {
-      signOut(auth)
-        .then(() => {
-          this.signedUserData = null;
-
-          Notify.create({
-            type: 'positive',
-            message: 'Sesión cerrada correctamente. ¡Hasta pronto! 👋',
-            position: 'top',
-          });
-
-          void useRouter().push('/login');
-        })
-        .catch((error) => {
-          console.error('Error during logout:', error.code, error.message);
-
-          Notify.create({
-            type: 'negative',
-            message: 'No se pudo cerrar la sesión. Inténtalo de nuevo.',
-            position: 'top',
-          });
-        });
-    },
-
-    /**
-     * Sets up a Firebase Auth listener to keep `signedUserData` updated.
-     * Redirects to `/home` if the user is authenticated, or to `/login` if not.
-     * Avoids redundant redirects to prevent navigation loops.
+     * Returns true if the operation succeeds, false otherwise.
      *
-     * @remarks
-     * Should be called once during app initialization.
+     * On success:
+     * - Clears stored user data
+     * - Shows a logout notification
+     * - Redirects to login page
      */
-    initAuthListener() {
-      const router = useRouter();
+    async logOutUser(): Promise<boolean> {
+      try {
+        await signOut(auth);
 
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          this.signedUserData = user;
+        this.signedUserData = null;
 
-          // Avoid redirect loop if already on home
-          if (router.currentRoute.value.path !== '/home') {
-            void router.push('/home');
-          }
-        } else {
-          this.signedUserData = null;
-          // Avoid redirect loop if already on login
-          if (router.currentRoute.value.path !== '/login') {
-            void router.push('/login');
-          }
-        }
-      });
+        Notify.create({
+          type: 'positive',
+          message: 'Sesión cerrada correctamente. ¡Hasta pronto! 👋',
+          position: 'top',
+        });
+
+        return true;
+      } catch (error) {
+        const firebaseError = error as { code: string; message: string };
+        console.error('Error during logout:', firebaseError.code, firebaseError.message);
+
+        Notify.create({
+          type: 'negative',
+          message: 'No se pudo cerrar la sesión. Inténtalo de nuevo.',
+          position: 'top',
+        });
+
+        return false;
+      }
     },
   },
 });

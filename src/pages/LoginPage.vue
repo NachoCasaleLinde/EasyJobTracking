@@ -16,7 +16,7 @@
           label="Iniciar Sesión"
           size="bg"
           rounded
-          @click="handleSignIn"
+          @click="logInUser"
         />
         <q-btn
           outline
@@ -25,7 +25,7 @@
           label="Crear Cuenta"
           size="bg"
           rounded
-          @click="handleSignUp"
+          @click="createAccount"
         />
       </div>
     </div>
@@ -39,6 +39,7 @@
 import { Notify } from 'quasar';
 import { useAuthStore } from 'src/stores/auth-store';
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 /* -------------------------------------------------------------------------- */
 /* IMPORTS                                                                    */
@@ -78,7 +79,7 @@ const password = ref('');
 /* -------------------------------------------------------------------------- */
 /* METHODS                                                                    */
 /* -------------------------------------------------------------------------- */
-const handleSignUp = () => {
+const createAccount = async () => {
   if (!isValidEmail(email.value)) {
     Notify.create({
       type: 'negative',
@@ -96,10 +97,12 @@ const handleSignUp = () => {
     });
     return;
   }
-  useAuthStore().signUpUser(email.value, password.value);
+
+  const result = await useAuthStore().signUpUser(email.value, password.value);
+  if (result === true) void useRouter().push('/');
 };
 
-const handleSignIn = () => {
+const logInUser = () => {
   if (!isValidEmail(email.value)) {
     Notify.create({
       type: 'negative',
