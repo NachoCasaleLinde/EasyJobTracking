@@ -102,7 +102,7 @@ const createAccount = async () => {
   if (result === true) void useRouter().push('/');
 };
 
-const logInUser = () => {
+const logInUser = async () => {
   if (!isValidEmail(email.value)) {
     Notify.create({
       type: 'negative',
@@ -120,7 +120,8 @@ const logInUser = () => {
     });
     return;
   }
-  useAuthStore().logInUser(email.value, password.value);
+  const result = await useAuthStore().logInUser(email.value, password.value);
+  if (result === true) void useRouter().push('/');
 };
 
 /**
