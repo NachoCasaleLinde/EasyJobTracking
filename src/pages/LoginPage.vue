@@ -38,8 +38,8 @@
 <script setup lang="ts">
 import { Notify } from 'quasar';
 import { useAuthStore } from 'src/stores/auth-store';
-import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { ref } from 'vue';
 
 /* -------------------------------------------------------------------------- */
 /* IMPORTS                                                                    */
@@ -66,6 +66,7 @@ import { useRouter } from 'vue-router';
 /* -------------------------------------------------------------------------- */
 /* STATE (refs, reactive, constants)                                         */
 /* -------------------------------------------------------------------------- */
+const router = useRouter();
 const email = ref('');
 const password = ref('');
 /* -------------------------------------------------------------------------- */
@@ -99,7 +100,7 @@ const createAccount = async () => {
   }
 
   const result = await useAuthStore().signUpUser(email.value, password.value);
-  if (result === true) void useRouter().push('/');
+  if (result === true) void router.push('/');
 };
 
 const logInUser = async () => {
@@ -121,7 +122,7 @@ const logInUser = async () => {
     return;
   }
   const result = await useAuthStore().logInUser(email.value, password.value);
-  if (result === true) void useRouter().push('/');
+  if (result === true) void router.push('/');
 };
 
 /**

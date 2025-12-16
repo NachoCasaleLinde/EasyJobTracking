@@ -24,6 +24,10 @@ const initAuthListener = () => {
 
     if (user) {
       authStore.signedUserData = user;
+
+      if (router.currentRoute.value.path !== '/') {
+        void router.push('/');
+      }
     } else {
       authStore.signedUserData = null;
 
