@@ -2,8 +2,10 @@ import { setGlobalOptions } from 'firebase-functions';
 import { onRequest } from 'firebase-functions/v2/https';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { IJobData } from './Interfaces/globalInterfaces';
+import { initializeApp } from 'firebase-admin/app';
 
 setGlobalOptions({ maxInstances: 10 });
+initializeApp();
 
 //* firebase deploy --only functions
 
@@ -13,6 +15,15 @@ setGlobalOptions({ maxInstances: 10 });
  */
 export const getJobs = onRequest(async (req, res) => {
   try {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+      res.status(204).send('');
+      return;
+    }
+
     if (req.method !== 'GET') {
       res.status(405).json({ error: 'Method not allowed' });
       return;
@@ -71,6 +82,15 @@ export const getJobs = onRequest(async (req, res) => {
  */
 export const updateJob = onRequest(async (req, res) => {
   try {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'PUT, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+      res.status(204).send('');
+      return;
+    }
+
     if (req.method !== 'PUT') {
       res.status(405).json({ error: 'Method not allowed' });
       return;
@@ -91,9 +111,11 @@ export const updateJob = onRequest(async (req, res) => {
 
     await docRef.set(
       {
-        [`jobs.${jobId}`]: {
-          ...job,
-          updatedAt: Date.now(),
+        jobs: {
+          [jobId]: {
+            ...job,
+            updatedAt: Date.now(),
+          },
         },
         updatedAt: Date.now(),
       },
@@ -120,6 +142,15 @@ export const updateJob = onRequest(async (req, res) => {
  */
 export const deleteJob = onRequest(async (req, res) => {
   try {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'DELETE, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+      res.status(204).send('');
+      return;
+    }
+
     if (req.method !== 'DELETE') {
       res.status(405).json({ error: 'Method not allowed' });
       return;
